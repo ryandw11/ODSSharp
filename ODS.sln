@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.28803.352
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ODS", "ODS\ODS.csproj", "{C1BF9859-CDD5-4D8B-84D1-85E6C7E559F0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ODSTest", "ODSTest\ODSTest.csproj", "{9874D165-8F42-440F-9CBB-EA667C425759}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C1BF9859-CDD5-4D8B-84D1-85E6C7E559F0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C1BF9859-CDD5-4D8B-84D1-85E6C7E559F0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C1BF9859-CDD5-4D8B-84D1-85E6C7E559F0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C1BF9859-CDD5-4D8B-84D1-85E6C7E559F0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9874D165-8F42-440F-9CBB-EA667C425759}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9874D165-8F42-440F-9CBB-EA667C425759}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9874D165-8F42-440F-9CBB-EA667C425759}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9874D165-8F42-440F-9CBB-EA667C425759}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {0741A2FE-E074-4F43-8132-CA0B7221AAA9}
+	EndGlobalSection
+EndGlobal
