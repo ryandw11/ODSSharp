@@ -11,7 +11,15 @@ The documentation of ODSSharp is not complete yet. You can use the [Java Documen
 # Usage
 As stated above ODS uses tags. There are many primative tags: StringTag, IntTag, ShortTag, LongTag, ByteTag, DoubleTag, FloatTag.
 There are also the ListTag and DirectoryTag. They both store primative tags in a list and directory format respectivly.
-Finally there are ObjectTags. ObjectTags store other tags. For more information about the possibilites be sure to check out the wiki and/or the [Java Documentation](https://ryandw11.github.io/ODS/)!
+Finally there are ObjectTags. ObjectTags store other tags. For more information about the possibilites be sure to check out the wiki and/or the [Java Documentation](https://ryandw11.github.io/ODS/)!  
+  
+You will need to use the following:
+```c#
+using ODS;
+using ODS.tag;
+// If you want to use the class serialization V
+using ODS.Serializer;
+```
 
 ## ODSUtil Utility Class
 The ODS class is full of useful methods that allow the easy serialization of primative objects.  
