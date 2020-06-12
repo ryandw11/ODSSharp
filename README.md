@@ -62,7 +62,7 @@ This tool allows you inspect ods files. The tool is coded in Java so you will ne
 [Click here to go to the visualizer repository.](https://github.com/ryandw11/ODS_Visualizer)
 
 # Offical Language Ports
- - [ODS (Java)] (https://github.com/ryandw11/ODS)
+ - [ODS (Java)](https://github.com/ryandw11/ODS)
  - C++ (Coming Soon)
  
  # ODS Specifications
