@@ -68,3 +68,9 @@ This tool allows you inspect ods files. The tool is coded in Java so you will ne
  # ODS Specifications
  The specifications for the ODS format can be found [here on the main respository](https://github.com/ryandw11/ODS#specification)
  
+# Contributing to the project
+Feel free to contribute any bug fixes or performance optimizations to this repository.  
+Any changes to the API must be suggested [on the main repository.](https://github.com/ryandw11/ODS)  
+
+# Dependencies 
+This project uses [SharpZipLib](https://github.com/icsharpcode/SharpZipLib) for ZLib compression. Their code is licensed under `MIT`.
