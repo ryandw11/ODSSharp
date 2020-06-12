@@ -1,4 +1,4 @@
-# ObjectDataStruct C# (ODSSharp)
+# ObjectDataStructure C# (ODSSharp)
 Object Data Structure is a file format inspired by NBT. Everything in this file format is made of tags.
 ODS is not human readable, data is stored in bytes.  
   
