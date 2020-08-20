@@ -24,5 +24,7 @@ namespace ODS
          * <returns>The name of the tag.</returns>
          */
         string GetName();
+
+        byte GetID();
     }
 }

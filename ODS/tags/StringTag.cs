@@ -3,7 +3,7 @@ using System.Text;
 using ODS.Stream;
 using System.IO;
 
-namespace ODS.tags
+namespace ODS.Tags
 {
     public class StringTag : Tag<string>
     {

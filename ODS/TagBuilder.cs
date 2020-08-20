@@ -1,6 +1,9 @@
-﻿using ODS.tags;
+﻿using ODS.Exceptions;
+using ODS.Tags;
 using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
+using System.Threading;
 
 namespace ODS
 {
@@ -112,7 +115,17 @@ namespace ODS
                 case 11:
                     return new ObjectTag(this.name).CreateFromData(this.valueBytes);
                 default:
-                    throw new Exception("Error: That data type does not exist! " + getDataType());
+                    foreach (ITag tag in ODSUtil.GetCustomTags())
+                    {
+                        if (getDataType() != tag.GetID()) continue;
+                        Type t = tag.GetType();
+                        ITag construct = (ITag) t.GetConstructor(new Type[] { typeof(string), typeof(byte[]) }).Invoke(new object[] { name, valueBytes });
+                        return construct;
+                    }
+                    if (!ODSUtil.ignoreInvalidCustomTags)
+                        throw new ODSException("Error: That data type does not exist! " + getDataType());
+                    else
+                        return new InvalidTag(name, null).CreateFromData(valueBytes);
             }
         }
     }

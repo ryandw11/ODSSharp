@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 
 using ODS;
-using ODS.tags;
+using ODS.Tags;
 
 namespace ODSTest
 {
@@ -11,7 +11,11 @@ namespace ODSTest
     {
         static void Main(string[] args)
         {
-            ObjectDataStructure ods = new ObjectDataStructure(new FileInfo(Directory.GetCurrentDirectory() + "\\test3.ods"));
+            ObjectDataStructure ods = new ObjectDataStructure(new FileInfo(Directory.GetCurrentDirectory() + "\\test3.ods"), Compression.GZIP);
+            // Register a custom tag.
+            ODSUtil.RegisterCustomTag(new CustomTag("", ""));
+
+            Console.WriteLine(Directory.GetCurrentDirectory() + "\\test3.ods");
 
             List<ITag> tags = new List<ITag>();
             tags.Add(new StringTag("ExampleKey", "This is an example string!"));
@@ -31,6 +35,8 @@ namespace ODSTest
 
             tags.Add(car);
 
+            tags.Add(new CustomTag("Test", "Test"));
+
             ods.Save(tags);
 
             // Loading Example
@@ -42,9 +48,14 @@ namespace ODSTest
             StringTag myCarType = (StringTag)myCar.GetTag("type");
             Console.WriteLine("The car is a " + myCarType.GetValue());
 
-            StringTag ownerFirstName = (StringTag) ods.GetObject("Car.Owner.firstName");
-            StringTag ownerLastName = (StringTag)ods.GetObject("Car.Owner.lastName");
+            StringTag ownerFirstName = (StringTag) ods.Get("Car.Owner.firstName");
+            StringTag ownerLastName = (StringTag)ods.Get("Car.Owner.lastName");
             Console.WriteLine("The owner of the car is " + ODSUtil.UnWrap(ownerFirstName) + " " + ODSUtil.UnWrap(ownerLastName));
+            Console.WriteLine(ods.Find("Car.Owner.firstName"));
+
+            Console.WriteLine(((CustomTag)ods.Get("Test")).GetValue());
+
+            ods.Set("Car.Owner.firstName", new StringTag("firstName", "Example"));
 
         }
     }

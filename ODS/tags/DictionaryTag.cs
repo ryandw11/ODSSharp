@@ -3,7 +3,7 @@ using ODS.Stream;
 using System.IO;
 using System.Collections.Generic;
 
-namespace ODS.tags
+namespace ODS.Tags
 {
     /**
      * This is the equivalent of a Map tag in the offical version.

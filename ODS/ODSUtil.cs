@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using ODS.tags;
+using ODS.Tags;
 using ODS.Serializer;
 using System.Reflection;
+using ODS.Exceptions;
 
 namespace ODS
 {
@@ -11,6 +12,8 @@ namespace ODS
      */
     public class ODSUtil
     {
+        internal static bool ignoreInvalidCustomTags = false; 
+        private static List<ITag> customTags = new List<ITag>();
 
         /**
          * <summary>Wrap an object to a tag. The name is not set by this method. This method
@@ -253,6 +256,43 @@ namespace ODS
                 return ((StringTag)tag).GetValue();
             }
             return null;
+        }
+
+        /**
+         * <summary>Register a custom tag into the system. (This tag must respect the reserved tag ids).</summary>
+         * 
+         * <param name="tag">The tag class to add.</param>
+         */
+        public static void RegisterCustomTag(ITag tag)
+        {
+            if(tag.GetID() < 15)
+            {
+                throw new ODSException("Invalid Tag ID. ID cannot be 0 - 15");
+            }
+            customTags.Add(tag);
+        }
+
+        /**
+         * <summary>Get the list of custom tags.</summary>
+         * 
+         * <returns>The list of custom tags.</returns>
+         */
+        public static List<ITag> GetCustomTags()
+        {
+            return customTags;
+        }
+
+        /**
+         * <summary>
+         * Informs ods whether or not to thrown an error when it comes across an undefined custom tag.
+         * <para>Only enable this when developing something like a visualizer program.</para>
+         * </summary>
+         * 
+         * <param name="value">Whether or not to thrown an error when it comes across an undefined custom tag.</param>
+         */
+        public static void AllowUndefinedTags(bool value)
+        {
+            ignoreInvalidCustomTags = value;
         }
     }
 }

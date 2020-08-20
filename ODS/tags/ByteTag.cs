@@ -3,9 +3,9 @@ using System.Text;
 using ODS.Stream;
 using System.IO;
 
-namespace ODS.tags
+namespace ODS.Tags
 {
-    public class ByteTag : Tag<Byte>
+    public class ByteTag : Tag<byte>
     {
         private string name;
         private byte value;
@@ -16,12 +16,12 @@ namespace ODS.tags
             this.value = value;
         }
 
-        public void SetValue(Byte s)
+        public void SetValue(byte s)
         {
             this.value = s;
         }
 
-        public Byte GetValue()
+        public byte GetValue()
         {
             return value;
         }
@@ -50,7 +50,7 @@ namespace ODS.tags
             dos.Write(memStream.ToArray());
         }
 
-        public Tag<Byte> CreateFromData(byte[] value)
+        public Tag<byte> CreateFromData(byte[] value)
         {
             this.value = value[0];
             return this;

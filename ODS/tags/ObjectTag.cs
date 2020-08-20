@@ -4,7 +4,7 @@ using ODS.Stream;
 using System.IO;
 using System.Collections.Generic;
 
-namespace ODS.tags
+namespace ODS.Tags
 {
     public class ObjectTag : Tag<List<ITag>>
     {

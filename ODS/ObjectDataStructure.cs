@@ -5,6 +5,11 @@ using System.IO.Compression;
 using System.Collections.Generic;
 using ODS.Stream;
 using ICSharpCode.SharpZipLib.Zip.Compression.Streams;
+using ODS.Util;
+using System.Diagnostics.Tracing;
+using ODS.Exceptions;
+using System.Collections.Specialized;
+using ODS.Tags;
 
 namespace ODS
 {
@@ -82,32 +87,6 @@ namespace ODS
         }
 
         /**
-         * <summary>Grab a tag based upon the name. This will not work with object notation, use #GetObject(string)
-         * instead.</summary>
-         * <param name="name">The name of the tag to get.</param>
-         * <returns>The tag. This will return null if no tag with the specified name is found or the file does not exist.</returns>
-         */
-        public ITag Get(string name)
-        {
-            if (!file.Exists)
-            {
-                return null;
-            }
-            FileStream fs = new FileStream(file.FullName, FileMode.Open, FileAccess.Read, FileShare.Read);
-            MemoryStream compressed = new MemoryStream();
-            fs.CopyTo(compressed);
-            byte[] uncompressed = decompress(compressed.ToArray());
-            MemoryStream memStream = new MemoryStream();
-            memStream.Write(uncompressed, 0, uncompressed.Length);
-            compressed.Close();
-
-            ITag outf = getSubData(memStream, name);
-            fs.Close();
-            memStream.Close();
-            return outf;
-        }
-
-        /**
          * <summary>Grab a tag based upon an object key. This method allows you to directly get sub-objects with little overhead.</summary>
          * <example>
          *      GetObject("primary.firstsub.secondsub");
@@ -115,7 +94,7 @@ namespace ODS
          * <param name="key">They key to search for.</param>
          * <returns>The tag. This will return null if no tag with the specified key path is found or the file does not exist.</returns>
          */
-        public ITag GetObject(string key)
+        public ITag Get(string key)
         {
             if (!file.Exists)
             {
@@ -250,17 +229,22 @@ namespace ODS
             return findSubObjectData(uncompressed, key); ;
         }
 
+        // TODO stuff
+
+
+
+
         /**
-         * <summary>Remove a tag from the list. **This will be updated in the future to support deleting object keys.**</summary>
-         * <param name="name">The tag name to remove</param>
-         * <returns>The index of where the data was deleted. This will return -1 if the file does not exist or if
-         * the requested key cannot be found.</returns>
+         * <summary>Remove a tag from the list.</summary>
+         * 
+         * <param name="key">The key to remove.</param>
+         * <returns>If the deletion was successfully done.</returns>
          */
-        public int Delete(string name)
+        public bool Delete(string key)
         {
             if (!file.Exists)
             {
-                return -1;
+                return false;
             }
             FileStream fs = new FileStream(file.FullName, FileMode.Open, FileAccess.Read, FileShare.Read);
             MemoryStream compressed = new MemoryStream();
@@ -268,24 +252,25 @@ namespace ODS
             byte[] uncompressed = decompress(compressed.ToArray());
             fs.Close();
 
-            MemoryStream ms = new MemoryStream();
-            BigBinaryWriter bw = new BigBinaryWriter(ms);
-
-            Tuple<int, byte[]> outf = deleteSubObjectData(uncompressed, name, bw);
-            byte[] recompressed = compress(outf.Item2);
+            KeyScout counter = ScoutObjectData(uncompressed, key, new KeyScout());
+            if (counter == null)
+            {
+                return false;
+            }
+            byte[] recompressed = compress(deleteSubObjectData(uncompressed, counter));
 
             FileStream newFile = new FileStream(file.FullName, FileMode.Open, FileAccess.Write, FileShare.Write);
             newFile.SetLength(0);
             newFile.Write(recompressed, 0, recompressed.Length);
             newFile.Close();
-            return outf.Item1;
+            return true;
         }
 
         /**
-         * <summary>Replace data with other data. Unlike the Java version, this method works with all compression types.</summary>
+         * <summary>Replace a key with another tag.</summary>
          * <param name="key">The key</param>
          * <param name="replacement">The data to replace the key</param>
-         * <returns>If the replacement was successful. (Will return false if the file does not exist or the key cannot be found).</returns>
+         * <returns>If the replacement was successful.</returns>
          */
         public bool ReplaceData(string key, ITag replacement)
         {
@@ -293,8 +278,6 @@ namespace ODS
             {
                 return false;
             }
-            int index = Delete(key);
-            if (index == -1) return false;
 
             FileStream fs = new FileStream(file.FullName, FileMode.Open, FileAccess.Read, FileShare.Read);
             MemoryStream compressed = new MemoryStream();
@@ -302,20 +285,147 @@ namespace ODS
             byte[] uncompressed = decompress(compressed.ToArray());
             fs.Close();
 
+            KeyScout counter = ScoutObjectData(uncompressed, key, new KeyScout());
+            if (counter.GetEnd() == null)
+            {
+                return false;
+            }
+
             MemoryStream memStream = new MemoryStream();
-            memStream.Write(uncompressed, 0, uncompressed.Length);
             BigBinaryWriter bbw = new BigBinaryWriter(memStream);
-            bbw.Seek(index, SeekOrigin.Begin);
             replacement.WriteData(bbw);
             bbw.Close();
 
+            byte[] replaceReturn = ReplaceSubObjectData(uncompressed, counter, memStream.ToArray());
+
             FileStream newFile = new FileStream(file.FullName, FileMode.Create, FileAccess.Write, FileShare.Write);
             newFile.SetLength(0);
-            byte[] recompressed = compress(memStream.ToArray());
+            byte[] recompressed = compress(replaceReturn);
             newFile.Write(recompressed, 0, recompressed.Length);
 
             newFile.Close();
             return true;
+        }
+
+        /**
+         * <summary>
+         * This method can append, delete, and set tags.
+         * <para>A note on keys when appending: <code>ObjectOne.ObjectTwo.tagName</code> When appending data <c>tagName</c> will not be the actual tag name.
+         * The tag name written to the file is the name of the specified tag in the value parameter. Any parent objects that do not exist will be created. For example:
+         * <code>ObjectOne.ObjectTwo.NewObject.tagName</code> If in the example above <c>NewObject</c> does not exist, than the object will be created with the value tag inside
+         * of it. Please see the wiki for a more detailed explanation on this.</para>
+         * <para>When value is null, the specified key is deleted. <c>The key MUST exist or an {@link ODSException} will be thrown.</c></para>
+         * </summary>
+         * 
+         * <param name="key">
+         * The key of the tag to append, delete, or set.
+         * <para>When appending the key does not need to exist. ObjectTags that don't exist will be created automatically.</para>
+         * <para>When the key is set to "" (An empty string) than it is assumed you want to append to the parent file.</para>
+         * <para>Valid Tags:</para>
+         *  <code>
+         *  <para>ObjectOne.tagToDelete</para>
+         *  <para>ObjectOne.NewObject.tagToAppend</para>
+         *  <para>ObjectOne.tagToSet</para>
+         *  </code>
+         * </param>
+         * 
+         * <param name="value">The tag to append or replace the key with. <para>If this parameter is null than the key will be deleted.</para></param>
+         * 
+         */
+        public void Set(string key, ITag value)
+        {
+            if(value == null)
+            {
+                bool output = Delete(key);
+                if (!output)
+                    throw new ODSException("The key " + key + " does not exist!");
+                return;
+            }
+            if(key == "")
+            {
+                Save(new List<ITag>(){ value });
+                return;
+            }
+            FileStream fs = new FileStream(file.FullName, FileMode.Open, FileAccess.Read, FileShare.Read);
+            MemoryStream compressed = new MemoryStream();
+            fs.CopyTo(compressed);
+            byte[] uncompressed = decompress(compressed.ToArray());
+            fs.Close();
+
+            KeyScout counter = ScoutObjectData(uncompressed, key, new KeyScout());
+            if (counter.GetEnd() == null)
+            {
+                if(counter.GetChildren().Count < 1)
+                {
+                    Append(value);
+                    return;
+                }
+                string existingKey = "";
+                foreach (KeyScoutChild child in counter.GetChildren())
+                {
+                    if (existingKey.Length != 0)
+                        existingKey += ".";
+                    existingKey += child.GetName();
+                }
+                string newKey = key.Replace(existingKey + ".", "");
+                ITag currentData;
+                if(newKey.Split('.').Length > 1)
+                {
+                    ObjectTag output = null;
+                    ObjectTag curTag = null;
+                    List<string> keys = new List<string>(newKey.Split('.'));
+                    int i = 0;
+                    foreach (string s in keys){
+                        if(i == 0)
+                        {
+                            output = new ObjectTag(s);
+                            curTag = output;
+                        }else if(i == keys.Count - 1)
+                        {
+                            curTag.AddTag(value);
+                        }
+                        else
+                        {
+                            ObjectTag tag = new ObjectTag(s);
+                            curTag.AddTag(tag);
+                            curTag = tag;
+                        }
+                        i++;
+                    }
+                    currentData = output;
+                }
+                else
+                {
+                    currentData = value;
+                }
+                // Actually replace the data and write it to the file.
+                MemoryStream memStream = new MemoryStream();
+                BigBinaryWriter bbw = new BigBinaryWriter(memStream);
+                currentData.WriteData(bbw);
+                bbw.Close();
+                byte[] outputArray = SetSubObjectData(uncompressed, counter, memStream.ToArray());
+
+                FileStream newFile = new FileStream(file.FullName, FileMode.Create, FileAccess.Write, FileShare.Write);
+                newFile.SetLength(0);
+                byte[] recompressed = compress(outputArray);
+                newFile.Write(recompressed, 0, recompressed.Length);
+                newFile.Close();
+            }
+            else
+            {
+                MemoryStream memStream = new MemoryStream();
+                BigBinaryWriter bbw = new BigBinaryWriter(memStream);
+                value.WriteData(bbw);
+                bbw.Close();
+
+                byte[] replaceReturn = ReplaceSubObjectData(uncompressed, counter, memStream.ToArray());
+                FileStream newFile = new FileStream(file.FullName, FileMode.Create, FileAccess.Write, FileShare.Write);
+                newFile.SetLength(0);
+                byte[] recompressed = compress(replaceReturn);
+                newFile.Write(recompressed, 0, recompressed.Length);
+                newFile.Close();
+            }
+
         }
 
         /**
@@ -480,7 +590,125 @@ namespace ODS
         /**
          * This is used to delete tags from the list. This does not support key format.
          */
-        private Tuple<int, byte[]> deleteSubObjectData(byte[] data, string key, BigBinaryWriter newFileWriter)
+        private byte[] deleteSubObjectData(byte[] data, KeyScout counter)
+        {
+            counter.RemoveAmount(counter.GetEnd().GetSize() + 5);
+
+            KeyScoutChild end = counter.GetEnd();
+
+            byte[] array1 = new byte[data.Length - (5 + end.GetSize())];
+            Array.Copy(data, 0, array1, 0, (end.GetStartingIndex() - 1));
+            Array.Copy(data, end.GetStartingIndex() + 4 + end.GetSize(),
+                array1, end.GetStartingIndex() - 1,
+                data.Length - (end.GetStartingIndex() + 4 + end.GetSize()));
+
+            foreach (KeyScoutChild child in counter.GetChildren())
+            {
+                int index = child.GetStartingIndex();
+                int size = child.GetSize();
+                array1[index] = (byte)(size >> 24);
+                array1[index + 1] = (byte)(size >> 16);
+                array1[index + 2] = (byte)(size >> 8);
+                array1[index + 3] = (byte) size;
+            }
+
+            return array1;
+        }
+
+        /**
+         * <summary>
+         * Replace a tag with another tag.
+         * </summary>
+         * <param name="data">The input array of bytes</param>
+         * <param name="counter">The scout object</param>
+         * <param name="dataToReplace">The bytes of the replacement data.</param>
+         * <returns>The output bytes.</returns>
+         */
+        private byte[] ReplaceSubObjectData(byte[] data, KeyScout counter, byte[] dataToReplace)
+        {
+            counter.RemoveAmount(counter.GetEnd().GetSize() + 5);
+            counter.AddAmount(dataToReplace.Length);
+
+            KeyScoutChild end = counter.GetEnd();
+
+
+            byte[] array1 = new byte[data.Length - (5 + end.GetSize()) + dataToReplace.Length];
+            //Copy all of the information before the removed data.
+            Array.Copy(data, 0, array1, 0, (end.GetStartingIndex() - 1));
+            Array.Copy(dataToReplace, 0, array1, end.GetStartingIndex() - 1, dataToReplace.Length);
+            // copy all of the information after the removed data.
+            Array.Copy(data, end.GetStartingIndex() + 4 + end.GetSize(),
+                    array1, end.GetStartingIndex() - 1 + dataToReplace.Length,
+                    data.Length - (end.GetStartingIndex() + 4 + end.GetSize()));
+
+            foreach (KeyScoutChild child in counter.GetChildren())
+            {
+                int index = child.GetStartingIndex();
+                int size = child.GetSize();
+                array1[index] = (byte)(size >> 24);
+                array1[index + 1] = (byte)(size >> 16);
+                array1[index + 2] = (byte)(size >> 8);
+                array1[index + 3] = (byte)(size);
+            }
+
+            return array1;
+        }
+
+        private byte[] SetSubObjectData(byte[] data, KeyScout counter, byte[] dataToReplace)
+        {
+            KeyScoutChild child = counter.GetChildren()[counter.GetChildren().Count - 1];
+
+
+            byte[] array1 = new byte[data.Length + dataToReplace.Length];
+            Array.Copy(data, 0, array1, 0, child.GetStartingIndex() + 4 + child.GetSize());
+            Array.Copy(dataToReplace, 0, array1, child.GetStartingIndex() + 4 + child.GetSize(), dataToReplace.Length);
+            Array.Copy(data, (child.GetStartingIndex() + 4 + child.GetSize()), array1, (child.GetStartingIndex() + 4 + child.GetSize()) + dataToReplace.Length,
+                    data.Length - (child.GetStartingIndex() + 4 + child.GetSize()));
+
+            counter.AddAmount(dataToReplace.Length);
+
+            foreach (KeyScoutChild childs in counter.GetChildren())
+            {
+                int index = childs.GetStartingIndex();
+                int size = childs.GetSize();
+                array1[index] = (byte)(size >> 24);
+                array1[index + 1] = (byte)(size >> 16);
+                array1[index + 2] = (byte)(size >> 8);
+                array1[index + 3] = (byte)(size);
+            }
+
+            return array1;
+        }
+
+        /**
+         * <summary>
+         * This object goes through the data and scouts out the information from the given key.
+         * This method is recursive, which is why the parameter offset exists.
+         * </summary>
+         * 
+         * <param name="data">The input array of bytes</param>
+         * <param name="key">The key</param>
+         * <param name="counter">The Scout object</param>
+         * <returns>The key scout.</returns>
+         */
+        private KeyScout ScoutObjectData(byte[] data, string key, KeyScout counter)
+        {
+            return ScoutObjectData(data, key, counter, 0);
+        }
+
+        /**
+         * <summary>
+         * This object goes through the data and scouts out the information from the given key.
+         * This method is recursive, which is why the parameter offset exists.
+         * </summary>
+         * 
+         * <param name="data">The input array of bytes</param>
+         * <param name="key">The key</param>
+         * <param name="counter">The Scout object</param>
+         * <param name="startIndex">The starting index for the count.</param>
+         * <returns>The key scout.</returns>
+         */
+        private KeyScout ScoutObjectData(byte[] data, string key, KeyScout counter, int startIndex)
         {
             MemoryStream stream = new MemoryStream(data);
             BigBinaryReader binReader = new BigBinaryReader(stream);
@@ -490,61 +718,51 @@ namespace ODS
 
             string name = key.Split('.')[0];
             string otherKey = getKey(key.Split('.'));
-
-
-            while (binReader.BaseStream.Position != binReader.BaseStream.Length)
+            while(binReader.BaseStream.Position != binReader.BaseStream.Length)
             {
-                bool found = true;
-                int start = (int)newFileWriter.BaseStream.Position;
-
+                KeyScoutChild child = new KeyScoutChild();
                 currentBuilder.setDataType(binReader.ReadByte());
+                child.SetStartingIndex((int) binReader.BaseStream.Position + startIndex);
                 currentBuilder.setDataSize(binReader.ReadInt32());
-                //TODO see if this is correct.
                 currentBuilder.setStartingIndex(binReader.BaseStream.Position);
                 currentBuilder.setNameSize(binReader.ReadInt16());
 
                 if (currentBuilder.getNameSize() != Encoding.UTF8.GetByteCount(name))
                 {
-                    found = false;
-                }
-
-                byte[] nameBytes = binReader.ReadBytes(currentBuilder.getNameSize());
-                String tagName = Encoding.UTF8.GetString(nameBytes);
-                currentBuilder.setName(tagName);
-                if (tagName != name)
-                {
-                    found = false;
-                }
-
-                byte[] value = binReader.ReadBytes((int)(currentBuilder.getStartingIndex() - stream.Position) + (int)currentBuilder.getDataSize());
-                currentBuilder.setValueBytes(value);
-
-                if (!found)
-                {
-                    addData(newFileWriter, currentBuilder);
+                    binReader.BaseStream.Seek((currentBuilder.getStartingIndex() - stream.Position) + currentBuilder.getDataSize(), SeekOrigin.Current);
                     currentBuilder = new TagBuilder();
                     continue;
                 }
 
+                byte[] nameBytes = binReader.ReadBytes(currentBuilder.getNameSize());
+                string tagName = Encoding.UTF8.GetString(nameBytes);
+                currentBuilder.setName(tagName);
+                if (tagName != name)
+                {
+                    binReader.BaseStream.Seek((currentBuilder.getStartingIndex() - stream.Position) + currentBuilder.getDataSize(), SeekOrigin.Current);
+                    currentBuilder = new TagBuilder();
+                    continue;
+                }
+                int binPos = (int)binReader.BaseStream.Position;
+                byte[] value = binReader.ReadBytes((int)(currentBuilder.getStartingIndex() - stream.Position) + (int)currentBuilder.getDataSize());
+                currentBuilder.setValueBytes(value);
+                
                 binReader.Close();
 
-                if (otherKey != null) { 
-                    return deleteSubObjectData(currentBuilder.getValueBytes(), otherKey, newFileWriter);
-                }
-                Tuple<int, byte[]> finalData = new Tuple<int, byte[]>(start, ((MemoryStream) newFileWriter.BaseStream).ToArray());
-                return finalData;
-            }
-            binReader.Close();
-            return new Tuple<int, byte[]>(-1, new byte[0]);
-        }
 
-        private void addData(BigBinaryWriter writer, TagBuilder builder)
-        {
-            writer.Write((byte)builder.getDataType());
-            writer.Write((int)builder.getDataSize());
-            writer.Write((short)builder.getNameSize());
-            writer.Write(Encoding.UTF8.GetBytes(builder.getName()));
-            writer.Write(builder.getValueBytes());
+                if (otherKey != null)
+                {
+                    child.SetSize(currentBuilder.getDataSize());
+                    child.SetName(currentBuilder.getName());
+                    counter.AddChild(child);
+                    return ScoutObjectData(currentBuilder.getValueBytes(), otherKey, counter, binPos + startIndex);
+                }
+                child.SetSize(currentBuilder.getDataSize());
+                child.SetName(currentBuilder.getName());
+                counter.SetEnd(child);
+                return counter;
+            }
+            return counter;
         }
 
         /**
