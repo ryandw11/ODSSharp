@@ -1,3 +1,4 @@
+![Nuget](https://img.shields.io/nuget/v/ODSSharp)
 # ObjectDataStructure C# (ODSSharp)
 Object Data Structure is a file format inspired by NBT. Everything in this file format is made of tags.
 ODS is not human readable, data is stored in bytes.  
@@ -8,6 +9,13 @@ The documentation of ODSSharp is not complete yet. You can use the [Java Documen
 
 ## Changes from the Java Version
 Please read the wiki for more information abou the changes from the Java version.
+
+# Installation
+Install ODSSharp via the `.NET CLI`
+```
+dotnet add package ODSSharp --version 1.0.0
+```
+or [via Nuget](https://www.nuget.org/packages/ODSSharp/1.0.0)
 
 # Usage
 As stated above ODS uses tags. There are many primative tags: StringTag, IntTag, ShortTag, LongTag, ByteTag, DoubleTag, FloatTag.
