@@ -4,9 +4,10 @@ ODS is not human readable, data is stored in bytes.
   
 This is the offical C# port of the [Java version of ODS](https://github.com/ryandw11/ODS). The API is kept as true to the Java version as possible while still compling with C# standards.  
   
-**ODSSharp is still in development and is not perfect yet. The API could change from update to update.**
-  
 The documentation of ODSSharp is not complete yet. You can use the [Java Documentation](https://ryandw11.github.io/ODS/) instead. It is almost the same besides the fact that methods are camel cased in Java.
+
+## Changes from the Java Version
+Please read the wiki for more information abou the changes from the Java version.
 
 # Usage
 As stated above ODS uses tags. There are many primative tags: StringTag, IntTag, ShortTag, LongTag, ByteTag, DoubleTag, FloatTag.
@@ -16,7 +17,7 @@ Finally there are ObjectTags. ObjectTags store other tags. For more information 
 You will need to use the following:
 ```c#
 using ODS;
-using ODS.tag;
+using ODS.Tags;
 // If you want to use the class serialization V
 using ODS.Serializer;
 ```
@@ -60,8 +61,8 @@ ObjectTag myCar = (ObjectTag) ods.Get("Car");
 StringTag myCarType = (StringTag)myCar.GetTag("type");
 Console.WriteLine("The car is a " + myCarType.GetValue());
 
-StringTag ownerFirstName = (StringTag) ods.GetObject("Car.Owner.firstName");
-StringTag ownerLastName = (StringTag)ods.GetObject("Car.Owner.lastName");
+StringTag ownerFirstName = (StringTag) ods.Get("Car.Owner.firstName");
+StringTag ownerLastName = (StringTag)ods.Get("Car.Owner.lastName");
 Console.WriteLine("The owner of the car is " + ODSUtil.UnWrap(ownerFirstName) + " " + ODSUtil.UnWrap(ownerLastName));
 ```
 # ODS Visualizer
