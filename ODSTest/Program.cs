@@ -4,6 +4,7 @@ using System.IO;
 
 using ODS;
 using ODS.Tags;
+using ODS.Compression;
 
 namespace ODSTest
 {
@@ -11,7 +12,7 @@ namespace ODSTest
     {
         static void Main(string[] args)
         {
-            ObjectDataStructure ods = new ObjectDataStructure(new FileInfo(Directory.GetCurrentDirectory() + "\\test3.ods"), Compression.GZIP);
+            ObjectDataStructure ods = new ObjectDataStructure(new FileInfo(Directory.GetCurrentDirectory() + "\\test3.ods"), new GZIPCompression());
             // Register a custom tag.
             ODSUtil.RegisterCustomTag(new CustomTag("", ""));
 

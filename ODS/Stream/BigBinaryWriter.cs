@@ -5,6 +5,9 @@ using System.IO;
 
 namespace ODS.Stream
 {
+    /**
+     * <summary>This is similar to BinaryWriter, but it writes in Big Endian format, which is what ODS uses.</summary>
+     */
     public class BigBinaryWriter : BinaryWriter
     {
         public BigBinaryWriter(System.IO.Stream stream) : base(stream) { }

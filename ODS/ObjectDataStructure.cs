@@ -1,15 +1,12 @@
 ﻿using System;
 using System.Text;
 using System.IO;
-using System.IO.Compression;
 using System.Collections.Generic;
 using ODS.Stream;
-using ICSharpCode.SharpZipLib.Zip.Compression.Streams;
 using ODS.Util;
-using System.Diagnostics.Tracing;
 using ODS.Exceptions;
-using System.Collections.Specialized;
 using ODS.Tags;
+using ODS.Compression;
 
 namespace ODS
 {
@@ -19,14 +16,14 @@ namespace ODS
     public class ObjectDataStructure
     {
         private FileInfo file;
-        private Compression compression;
+        private Compressor compression;
 
         /**
          * <summary>Construct the primary class with a file and compression type.</summary>
          * <param name="file">The file to use.</param>
          * <param name="compression">The compression that should be used.</param>
          */
-        public ObjectDataStructure(FileInfo file, Compression compression)
+        public ObjectDataStructure(FileInfo file, Compressor compression)
         {
             this.file = file;
             this.compression = compression;
@@ -39,51 +36,17 @@ namespace ODS
         public ObjectDataStructure(FileInfo file)
         {
             this.file = file;
-            this.compression = Compression.GZIP;
+            this.compression = new GZIPCompression();
         }
 
         private byte[] compress(byte[] data)
         {
-            if(compression == Compression.GZIP)
-            {
-                MemoryStream stream = new MemoryStream();
-                GZipStream zipStream = new GZipStream(stream, CompressionMode.Compress);
-                zipStream.Write(data, 0, data.Length);
-                zipStream.Close();
-                return stream.ToArray();
-            }
-            else if(compression == Compression.ZLIB)
-            {
-                MemoryStream stream = new MemoryStream();
-                DeflaterOutputStream zipStream = new DeflaterOutputStream(stream);
-                zipStream.Write(data, 0, data.Length);
-                zipStream.Close();
-                return stream.ToArray();
-            }
-            return data;
+            return compression.Compress(data);
         }
 
         private byte[] decompress(byte[] data)
         {
-            if (compression == Compression.GZIP)
-            {
-                MemoryStream stream = new MemoryStream(data);
-                GZipStream zipStream = new GZipStream(stream, CompressionMode.Decompress);
-                MemoryStream output = new MemoryStream();
-                zipStream.CopyTo(output);
-                zipStream.Close();
-                return output.ToArray();
-            }
-            else if (compression == Compression.ZLIB)
-            {
-                MemoryStream stream = new MemoryStream(data);
-                InflaterInputStream zipStream = new InflaterInputStream(stream);
-                MemoryStream output = new MemoryStream();
-                zipStream.CopyTo(output);
-                zipStream.Close();
-                return output.ToArray();
-            }
-            return data;
+            return compression.Decompress(data);
         }
 
         /**

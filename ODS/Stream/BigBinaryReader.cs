@@ -5,6 +5,9 @@ using System.IO;
 
 namespace ODS.Stream
 {
+    /**
+     * <summary>This is similar to BinaryReader but in Big Endian format, which is what ODS uses.</summary>
+     */
     public class BigBinaryReader : BinaryReader
     {
         public BigBinaryReader(System.IO.Stream stream) : base(stream) { }

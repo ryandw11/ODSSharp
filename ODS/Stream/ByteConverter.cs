@@ -4,6 +4,9 @@ using System.Text;
 
 namespace ODS.Stream
 {
+    /**
+     * <summary>This utility class swaps the Endianess of the formats.</summary>
+     */
     public class ByteConverter
     {
         public static Int32 ToInt32(byte[] bits)

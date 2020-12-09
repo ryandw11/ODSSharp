@@ -2,10 +2,26 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <PackageId>ODSSharp</PackageId>
+    <Authors>Ryandw11</Authors>
+    <Company>Ryandw11</Company>
+    <Product>Object Data Structure</Product>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <Description>Object Data Structure is a fast byte based file format designed for video games.</Description>
+    <RepositoryUrl>https://github.com/ryandw11/ODSSharp</RepositoryUrl>
+    <PackageTags>ODS, File Format, File, Storage, Fast, Games</PackageTags>
+    <Version>1.0.1</Version>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="SharpZipLib" Version="1.2.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\LICENSE">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
   </ItemGroup>
 
 </Project>
