@@ -1,4 +1,6 @@
-﻿namespace ODS.Compression
+﻿using System.IO;
+
+namespace ODS.Compression
 {
     /**
      * <summary>
@@ -13,13 +15,13 @@
          * <param name="data">The array of bytes to compress.</param>
          * <returns>The array of compressed bytes.</returns>
          */
-        byte[] Compress(byte[] data);
+         Stream GetCompressStream(Stream stream);
 
         /**
          * <summary>Decompress an array of bytes.</summary>
          * <param name="data">The array of bytes to decompress.</param>
          * <returns>The array of decompressed bytes.</returns>
          */
-        byte[] Decompress(byte[] data);
+        Stream GetDecompressStream(Stream stream);
     }
 }

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using ODS;
-using ODS.Stream;
+using ODS.ODSStreams;
 using System.IO;
 
 namespace ODSTest

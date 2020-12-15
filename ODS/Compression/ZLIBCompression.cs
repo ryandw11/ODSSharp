@@ -8,23 +8,14 @@ namespace ODS.Compression
      */
     public class ZLIBCompression : Compressor
     {
-        public byte[] Compress(byte[] data)
+        public System.IO.Stream GetCompressStream(System.IO.Stream stream)
         {
-            MemoryStream stream = new MemoryStream();
-            DeflaterOutputStream zipStream = new DeflaterOutputStream(stream);
-            zipStream.Write(data, 0, data.Length);
-            zipStream.Close();
-            return stream.ToArray();
+            return new DeflaterOutputStream(stream);
         }
 
-        public byte[] Decompress(byte[] data)
+        public System.IO.Stream GetDecompressStream(System.IO.Stream stream)
         {
-            MemoryStream stream = new MemoryStream(data);
-            InflaterInputStream zipStream = new InflaterInputStream(stream);
-            MemoryStream output = new MemoryStream();
-            zipStream.CopyTo(output);
-            zipStream.Close();
-            return output.ToArray();
+            return new InflaterInputStream(stream);
         }
     }
 }

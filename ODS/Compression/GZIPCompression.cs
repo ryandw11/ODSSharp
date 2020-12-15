@@ -8,23 +8,15 @@ namespace ODS.Compression
      */
     public class GZIPCompression : Compressor
     {
-        public byte[] Compress(byte[] data)
+
+        public Stream GetCompressStream(Stream stream)
         {
-            MemoryStream stream = new MemoryStream();
-            GZipStream zipStream = new GZipStream(stream, CompressionMode.Compress);
-            zipStream.Write(data, 0, data.Length);
-            zipStream.Close();
-            return stream.ToArray();
+            return new GZipStream(stream, CompressionMode.Compress, true);
         }
 
-        public byte[] Decompress(byte[] data)
+        public Stream GetDecompressStream(Stream stream)
         {
-            MemoryStream stream = new MemoryStream(data);
-            GZipStream zipStream = new GZipStream(stream, CompressionMode.Decompress);
-            MemoryStream output = new MemoryStream();
-            zipStream.CopyTo(output);
-            zipStream.Close();
-            return output.ToArray();
+            return new GZipStream(stream, CompressionMode.Decompress, true);
         }
     }
 }

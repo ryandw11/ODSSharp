@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Text;
-using ODS.Stream;
+using ODS.ODSStreams;
 using System.IO;
 using System.Collections.Generic;
+
+using ODS.Internal;
 
 namespace ODS.Tags
 {
@@ -98,7 +100,7 @@ namespace ODS.Tags
 
         public Tag<List<ITag>> CreateFromData(byte[] value)
         {
-            this.value = ObjectDataStructure.GetListData<ITag>(value);
+            this.value = InternalUtils.GetListData<ITag>(value);
             return this;
         }
 

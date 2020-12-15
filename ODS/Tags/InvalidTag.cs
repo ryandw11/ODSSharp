@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using ODS.Stream;
+using ODS.ODSStreams;
 using System.IO;
 using ODS.Exceptions;
 

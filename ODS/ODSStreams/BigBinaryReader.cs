@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using System.Text;
 using System.IO;
 
-namespace ODS.Stream
+namespace ODS.ODSStreams
 {
     /**
      * <summary>This is similar to BinaryReader but in Big Endian format, which is what ODS uses.</summary>
      */
     public class BigBinaryReader : BinaryReader
     {
-        public BigBinaryReader(System.IO.Stream stream) : base(stream) { }
+        public BigBinaryReader(Stream stream) : base(stream) { }
 
         public override int ReadInt32()
         {

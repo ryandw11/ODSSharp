@@ -1,7 +1,9 @@
 ﻿using System.Text;
-using ODS.Stream;
+using ODS.ODSStreams;
 using System.IO;
 using System.Collections.Generic;
+
+using ODS.Internal;
 
 namespace ODS.Tags
 {
@@ -62,7 +64,7 @@ namespace ODS.Tags
 
         public Tag<IDictionary<string, T>> CreateFromData(byte[] value)
         {
-            List<T> data = ObjectDataStructure.GetListData<T>(value);
+            List<T> data = InternalUtils.GetListData<T>(value);
             SortedDictionary<string, T> output = new SortedDictionary<string, T>();
             foreach(T tag in data)
             {
