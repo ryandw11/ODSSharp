@@ -291,7 +291,7 @@ namespace ODS.Internal
 
         }
 
-        public byte[] export(Compressor compressor)
+        public byte[] Export(Compressor compressor)
         {
             using (MemoryStream mem = new MemoryStream())
             {

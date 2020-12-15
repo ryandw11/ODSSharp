@@ -186,6 +186,10 @@ namespace ODS
             odsInternal.Set(key, value);
         }
 
-        
+        public byte[] Export(Compressor compressor)
+        {
+            return odsInternal.Export(compressor);
+        }
+
     }
 }

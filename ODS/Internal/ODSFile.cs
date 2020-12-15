@@ -405,7 +405,7 @@ namespace ODS.Internal
 
         }
 
-        public byte[] export(Compressor compressor)
+        public byte[] Export(Compressor compressor)
         {
             using (FileStream fileStream = new FileStream(file.FullName, FileMode.Create, FileAccess.Write, FileShare.Write))
             {

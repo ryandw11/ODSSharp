@@ -17,6 +17,6 @@ namespace ODS.Internal
         bool Delete(string key);
         bool ReplaceData(string key, ITag replacement);
         void Set(string key, ITag value);
-        byte[] export(Compressor compressor);
+        byte[] Export(Compressor compressor);
     }
 }
