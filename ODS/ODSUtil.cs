@@ -15,6 +15,8 @@ namespace ODS
         internal static bool ignoreInvalidCustomTags = false; 
         private static List<ITag> customTags = new List<ITag>();
 
+        private ODSUtil() { }
+
         /**
          * <summary>Wrap an object to a tag. The name is not set by this method. This method
          * cannot wrap Lists or Dictionaries. Objects are automatically serialized.</summary>
@@ -97,8 +99,8 @@ namespace ODS
          * <summary>Wrap a list into a list tag.</summary>
          * <param name="name">The name of the list tag.</param>
          * <param name="list">The list to turn into a list tag. The list can only contain objects that
-         * can be converted into tags. The contents of the list are atuomatically wrapped. Note: this list cannot
-         * contain Objects, other Lists, or Dictionaries.</param>
+         * can be converted into tags. The contents of the list are atuomatically wrapped. <para>Note: this list cannot
+         * contain Objects, other Lists, or Dictionaries.</para></param>
          * <typeparam name="T">The data type of the list.</typeparam>
          * <returns>The wrapped ListTag</returns>
          */

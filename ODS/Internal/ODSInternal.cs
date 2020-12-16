@@ -6,6 +6,10 @@ using ODS.Compression;
 
 namespace ODS.Internal
 {
+    /**
+     * <summary>This is the interface that handles the internal storage types.</summary>
+     * <remarks>See <see cref="ObjectDataStructure"/> for comments on the API.</remarks>
+     */
     interface ODSInternal
     {
         ITag Get(string key);
@@ -17,6 +21,6 @@ namespace ODS.Internal
         bool Delete(string key);
         bool ReplaceData(string key, ITag replacement);
         void Set(string key, ITag value);
-        byte[] Export(Compressor compressor);
+        byte[] Export(ICompressor compressor);
     }
 }

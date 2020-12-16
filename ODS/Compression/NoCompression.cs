@@ -3,7 +3,7 @@
     /**
      * <summary>This will not compress the file.</summary>
      */
-    public class NoCompression : Compressor
+    public class NoCompression : ICompressor
     {
         public System.IO.Stream GetCompressStream(System.IO.Stream stream)
         {

@@ -8,7 +8,7 @@ namespace ODS.Compression
      * Unlike the Java version of ODS, an input stream is not needed.
      * </summary>
      */
-    public interface Compressor
+    public interface ICompressor
     {
         /**
          * <summary>Compress an array of bytes.</summary>

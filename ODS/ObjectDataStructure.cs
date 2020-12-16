@@ -9,7 +9,7 @@ namespace ODS
      * <summary>
      * Primary class of the ObjectDataStructure library.
      * <para>ObjectDataStructure has two storage types: File and Memory. File reads from a file while memory deals with
-     * an array (or buffer) of bytes. This class deals with both types. The type is dependent on the constructor.</para>
+     * an array of bytes. This class deals with both types. The type is dependent on the constructor.</para>
      * <para>Most methods in ODS use what is called a key to reference objects within the file/buffer. A key allows you to grab specific
      * information within the file/buffer. For example: If you wanted a specific string inside of an object with lots of information,
      * you can get that specific string without any other data. If you have an object named Car and you wanted to get a string tag named
@@ -35,7 +35,7 @@ namespace ODS
          * <param name="file">The file to use.</param>
          * <param name="compression">The compression that should be used.</param>
          */
-        public ObjectDataStructure(FileInfo file, Compressor compression)
+        public ObjectDataStructure(FileInfo file, ICompressor compression)
         {
             this.odsInternal = new ODSFile(file, compression);
         }
@@ -54,7 +54,7 @@ namespace ODS
          * <param name="data">Pre-existing data that should be inserted into the memory stream.</param>
          * <param name="compressor">The compression format the data uses.</param>
          */
-        public ObjectDataStructure(byte[] data, Compressor compressor)
+        public ObjectDataStructure(byte[] data, ICompressor compressor)
         {
             this.odsInternal = new ODSMem(data, compressor);
         }
@@ -67,14 +67,9 @@ namespace ODS
             this.odsInternal = new ODSMem();
         }
 
-        /*
-         * TODO :: Finish updaing the comments. 
-         * 
-         * 
-         */
-
         /**
-         * <summary>Grab a tag based upon an object key. This method allows you to directly get sub-objects with little overhead.</summary>
+         * <summary>Grab a tag based upon an object key. 
+         * <para>This method allows you to directly get sub-objects with little overhead.</para></summary>
          * <example>
          *      Get("primary.firstsub.secondsub");
          * </example>
@@ -87,7 +82,7 @@ namespace ODS
         }
 
         /**
-         * <summary>Get all of the tags in the file.</summary>
+         * <summary>Get all of the tags in the file or buffer.</summary>
          * <returns>All of the tags. This returns null if the file does not exist.</returns>
          */
         public List<ITag> GetAll()
@@ -96,9 +91,9 @@ namespace ODS
         }
 
         /**
-         * <summary>Save tags to the file. This method will create a new file if one does not exist.
-         * This will overwrite the existing file. To append tags
-         * see #Append(ITag) and #AppendAll(List)</summary>
+         * <summary>Save tags to the file or buffer.
+         * <para>This will overwrite the existing file or buffer. To append tags see <see cref="Append(ITag)"/> and <see cref="AppendAll(List{ITag})"/></para>
+         * </summary>
          * <param name="tags">The list of tags to save.</param>
          */
         public void Save(List<ITag> tags)
@@ -107,7 +102,7 @@ namespace ODS
         }
 
         /**
-         * <summary>Append tags to the end of the file.</summary>
+         * <summary>Append tags to the end of the data.</summary>
          * <param name="tag">The tag to be appended.</param>
          */
         public void Append(ITag tag)
@@ -116,7 +111,7 @@ namespace ODS
         }
 
         /**
-         * <summary>Append a list of tags to the end of the file.</summary>
+         * <summary>Append a list of tags to the end of the data.</summary>
          * <param name="tags">The list of tags.</param>
          */
         public void AppendAll(List<ITag> tags)
@@ -125,7 +120,7 @@ namespace ODS
         }
 
         /**
-         * <summary>Find if a key exists within a file.</summary>
+         * <summary>Find if a key exists within the data.</summary>
          * <param name="key">The key to find.</param>
          * <returns>If the key exists.</returns>
          */
@@ -163,7 +158,7 @@ namespace ODS
          * The tag name written to the file is the name of the specified tag in the value parameter. Any parent objects that do not exist will be created. For example:
          * <code>ObjectOne.ObjectTwo.NewObject.tagName</code> If in the example above <c>NewObject</c> does not exist, than the object will be created with the value tag inside
          * of it. Please see the wiki for a more detailed explanation on this.</para>
-         * <para>When value is null, the specified key is deleted. <c>The key MUST exist or an {@link ODSException} will be thrown.</c></para>
+         * <para>When value is null, the specified key is deleted. <c>The key MUST exist or an <see cref="ODS.Exceptions.ODSException"/> will be thrown.</c></para>
          * </summary>
          * 
          * <param name="key">
@@ -186,7 +181,13 @@ namespace ODS
             odsInternal.Set(key, value);
         }
 
-        public byte[] Export(Compressor compressor)
+        /**
+         * <summary>Get the array of bytes in any compression format.</summary>
+         * 
+         * <param name="compressor">The compression format.</param>
+         * <returns>The array of bytes.</returns>
+         */
+        public byte[] Export(ICompressor compressor)
         {
             return odsInternal.Export(compressor);
         }

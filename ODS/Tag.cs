@@ -23,11 +23,5 @@
          * <returns>The tag that is created from the value bytes.</returns>
          */
         Tag<T> CreateFromData(byte[] value);
-
-        /**
-         * <summary>Get the byte id of the tag.</summary>
-         * <returns>The byte id.</returns>
-         */
-        byte GetID();
     }
 }

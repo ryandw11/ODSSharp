@@ -8,11 +8,23 @@ using ODS.Util;
 
 namespace ODS.Internal
 {
+    /**
+     * <summary>This class serves as a utility class for the internals of ODS.</summary>
+     */
     class InternalUtils
     {
         /**
-         * Used to get a tag from the file.
+         * <summary>
+         * Get a tag from a stream via a name.
+         * 
+         * <para>This method is deprecated. Use <see cref="GetSubObjectData(Stream, string)"/> instead.</para>
+         * 
+         * </summary>
+         * 
+         * <param name="stream">The stream to look for the tag in.</param>
+         * <param name="name">The name of the object to find. (This is not the key!)</param>
          */
+        [Obsolete]
         public static ITag getSubData(Stream stream, string name)
         {
             BigBinaryReader binReader = new BigBinaryReader(stream);
@@ -52,9 +64,13 @@ namespace ODS.Internal
         }
 
         /**
-         * Used to get a tag from the file using the key system.
+         * <summary>Get a tag from a stream using the key system.</summary>
+         * 
+         * <param name="stream">The stream to read from. (Position is expected to be at 0.)</param>
+         * <param name="key">The key of the tag that you want to find.</param>
+         * <returns>Returns the desired tag.</returns>
          */
-        public static ITag getSubObjectData(Stream stream, string key)
+        public static ITag GetSubObjectData(Stream stream, string key)
         {
             BigBinaryReader binReader = new BigBinaryReader(stream);
             TagBuilder currentBuilder = new TagBuilder();
@@ -89,7 +105,7 @@ namespace ODS.Internal
                 }
 
                 if (otherKey != null)
-                    return getSubObjectData(stream, otherKey);
+                    return GetSubObjectData(stream, otherKey);
 
                 byte[] value = binReader.ReadBytes((int)(currentBuilder.getStartingIndex() - stream.Position) + (int)currentBuilder.getDataSize());
                 currentBuilder.setValueBytes(value);
@@ -110,9 +126,13 @@ namespace ODS.Internal
         }
 
         /**
-         * This is used to find the tags using the key system.
+         * <summary>Checks to see if a key exists within a stream.</summary>
+         * <param name="stream">The stream to check in.</param>
+         * <param name="key">The key to find.</param>
+         * 
+         * <returns>If the key exists.</returns>
          */
-        public static bool findSubObjectData(Stream stream, string key)
+        public static bool FindSubObjectData(Stream stream, string key)
         {
             BigBinaryReader binReader = new BigBinaryReader(stream);
             TagBuilder currentBuilder = new TagBuilder();
@@ -149,7 +169,7 @@ namespace ODS.Internal
                 
 
                 if (otherKey != null)
-                    return findSubObjectData(stream, otherKey);
+                    return FindSubObjectData(stream, otherKey);
 
                 byte[] value = binReader.ReadBytes((int)(currentBuilder.getStartingIndex() - stream.Position) + (int)currentBuilder.getDataSize());
                 currentBuilder.setValueBytes(value);
@@ -161,7 +181,11 @@ namespace ODS.Internal
 
 
         /**
-         * This is used to delete tags from the list. This does not support key format.
+         * <summary>Delete a tag from an array of bytes using the KeyScout.</summary>
+         * 
+         * <param name="data">The byte array to remove data from.</param>
+         * <param name="counter">The KeyScout that contains information about the tag to remove.</param>
+         * <returns>The byte array after the deletion.</returns>
          */
         public static byte[] deleteSubObjectData(byte[] data, KeyScout counter)
         {
@@ -193,9 +217,9 @@ namespace ODS.Internal
          * Replace a tag with another tag.
          * </summary>
          * <param name="data">The input array of bytes</param>
-         * <param name="counter">The scout object</param>
+         * <param name="counter">The KeyScout object conatining the information of the tag to replace.</param>
          * <param name="dataToReplace">The bytes of the replacement data.</param>
-         * <returns>The output bytes.</returns>
+         * <returns>The byte array after the replacement.</returns>
          */
         public static byte[] ReplaceSubObjectData(byte[] data, KeyScout counter, byte[] dataToReplace)
         {
@@ -227,6 +251,14 @@ namespace ODS.Internal
             return array1;
         }
 
+        /**
+         * <summary>Insert in a new tag.</summary>
+         * <param name="data">The input array of bytes.</param>
+         * <param name="counter">The KeyScout object containing information of the tag to set.</param>
+         * <param name="dataToReplace">The bytes of the replacement data.</param>
+         * 
+         * <returns>The output bytes.</returns>
+         */
         public static byte[] SetSubObjectData(byte[] data, KeyScout counter, byte[] dataToReplace)
         {
             KeyScoutChild child = counter.GetChildren()[counter.GetChildren().Count - 1];
@@ -341,6 +373,7 @@ namespace ODS.Internal
         /**
          * <summary>Get a list of Tags from an array of bytes. This is meant for internal use only.</summary>
          * <param name="data">The array of bytes.</param>
+         * <returns>The list of tags.</returns>
          */
         public static List<T> GetListData<T>(byte[] data) where T : ITag
         {
@@ -351,8 +384,9 @@ namespace ODS.Internal
         }
 
         /**
-         * <summary>Get a list of Tags from an array of bytes. This is meant for internal use only.</summary>
-         * <param name="data">The array of bytes.</param>
+         * <summary>Get a list of Tags from a stream. This is meant for internal use only.</summary>
+         * <param name="stream">The stream to read from. (Position is expected to be at 0).</param>
+         * <returns>The list of tags.</returns>
          */
         public static List<T> GetListData<T>(Stream stream) where T : ITag
         {

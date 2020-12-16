@@ -9,18 +9,24 @@ using ODS.Compression;
 
 namespace ODS.Internal
 {
+    /**
+     * <summary>
+     * This class handles the file storage type for ODS.
+     * <para>This class is for internal use only. Use <see cref="ObjectDataStructure"/> instead of this class.</para>
+     * </summary>
+     */
     public class ODSFile : ODSInternal
     {
 
         private FileInfo file;
-        private Compressor compression;
+        private ICompressor compression;
 
         /**
          * <summary>Construct the primary class with a file and compression type.</summary>
          * <param name="file">The file to use.</param>
          * <param name="compression">The compression that should be used.</param>
          */
-        public ODSFile(FileInfo file, Compressor compression)
+        public ODSFile(FileInfo file, ICompressor compression)
         {
             this.file = file;
             this.compression = compression;
@@ -69,7 +75,7 @@ namespace ODS.Internal
 
                 readStream.Position = 0;
 
-                ITag outf = InternalUtils.getSubObjectData(readStream, key);
+                ITag outf = InternalUtils.GetSubObjectData(readStream, key);
 
                 return outf;
             }
@@ -193,7 +199,7 @@ namespace ODS.Internal
                 using (Stream stream = GetDecompressStream(fs))
                     stream.CopyTo(readStream);
                 readStream.Position = 0;
-                return InternalUtils.findSubObjectData(readStream, key);
+                return InternalUtils.FindSubObjectData(readStream, key);
             }
         }
 
@@ -405,7 +411,7 @@ namespace ODS.Internal
 
         }
 
-        public byte[] Export(Compressor compressor)
+        public byte[] Export(ICompressor compressor)
         {
             using (FileStream fileStream = new FileStream(file.FullName, FileMode.Create, FileAccess.Write, FileShare.Write))
             {

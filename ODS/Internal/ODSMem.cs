@@ -9,6 +9,11 @@ using ODS.Compression;
 
 namespace ODS.Internal
 {
+    /**
+     * <summary>This class handles the Memory storage type of ODS.
+     * <para>This is for internal use only. Use <see cref="ObjectDataStructure"/> instead of this class.</para>
+     * </summary>
+     */
     public class ODSMem : ODSInternal
     {
 
@@ -19,7 +24,7 @@ namespace ODS.Internal
          * <param name="file">The file to use.</param>
          * <param name="compression">The compression that should be used.</param>
          */
-        public ODSMem(byte[] data, Compressor compressor)
+        public ODSMem(byte[] data, ICompressor compressor)
         {
             using (MemoryStream mem = new MemoryStream(data))
             {
@@ -51,7 +56,7 @@ namespace ODS.Internal
 
             memStream.Position = 0;
 
-            ITag outf = InternalUtils.getSubObjectData(memStream, key);
+            ITag outf = InternalUtils.GetSubObjectData(memStream, key);
 
             return outf;
         }
@@ -123,7 +128,7 @@ namespace ODS.Internal
         public bool Find(string key)
         {
             memStream.Position = 0;
-            return InternalUtils.findSubObjectData(memStream, key);
+            return InternalUtils.FindSubObjectData(memStream, key);
         }
 
 
@@ -291,7 +296,7 @@ namespace ODS.Internal
 
         }
 
-        public byte[] Export(Compressor compressor)
+        public byte[] Export(ICompressor compressor)
         {
             using (MemoryStream mem = new MemoryStream())
             {

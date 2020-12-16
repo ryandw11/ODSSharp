@@ -6,7 +6,7 @@ namespace ODS.Compression
     /**
      * <summary>Compress the file using the ZLIB compression format.</summary>
      */
-    public class ZLIBCompression : Compressor
+    public class ZLIBCompression : ICompressor
     {
         public System.IO.Stream GetCompressStream(System.IO.Stream stream)
         {

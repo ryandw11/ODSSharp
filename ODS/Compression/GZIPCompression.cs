@@ -6,7 +6,7 @@ namespace ODS.Compression
     /**
      * <summary>Compress the file using the GZIP compression format.</summary>
      */
-    public class GZIPCompression : Compressor
+    public class GZIPCompression : ICompressor
     {
 
         public Stream GetCompressStream(Stream stream)
