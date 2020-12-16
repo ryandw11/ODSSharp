@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.IO;
 
-namespace ODS.Stream
+namespace ODS.ODSStreams
 {
     /**
      * <summary>This is similar to BinaryWriter, but it writes in Big Endian format, which is what ODS uses.</summary>

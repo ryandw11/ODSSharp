@@ -1,41 +1,64 @@
 ﻿using System;
 using System.Text;
-using ODS.Stream;
+using ODS.ODSStreams;
 using System.IO;
 
 namespace ODS.Tags
 {
-    public class DoubleTag : Tag<Double>
+    /**
+     * <summary>A tag that contains a double.</summary>
+     */
+    public class DoubleTag : Tag<double>
     {
         private string name;
-        private Double value;
+        private double value;
 
-        public DoubleTag(String name, Double value)
+        /**
+         * <summary>Construct a double tag.</summary>
+         * <param name="name">The name of the tag.</param>
+         * <param name="value">The value of the tag.</param>
+         */
+        public DoubleTag(string name, double value)
         {
             this.name = name;
             this.value = value;
         }
 
-        public void SetValue(Double s)
+        /**
+         * <inheritdoc/>
+         */
+        public void SetValue(double s)
         {
             this.value = s;
         }
 
-        public Double GetValue()
+        /**
+         * <inheritdoc/>
+         */
+        public double GetValue()
         {
             return value;
         }
 
-        public void SetName(String name)
+        /**
+         * <inheritdoc/>
+         */
+        public void SetName(string name)
         {
             this.name = name;
         }
 
-        public String GetName()
+        /**
+         * <inheritdoc/>
+         */
+        public string GetName()
         {
             return name;
         }
 
+        /**
+         * <inheritdoc/>
+         */
         public void WriteData(BigBinaryWriter dos)
         {
             dos.Write(GetID());
@@ -50,12 +73,18 @@ namespace ODS.Tags
             dos.Write(memStream.ToArray());
         }
 
-        public Tag<Double> CreateFromData(byte[] value)
+        /**
+         * <inheritdoc/>
+         */
+        public Tag<double> CreateFromData(byte[] value)
         {
             this.value = ByteConverter.ToDouble(value);
             return this;
         }
 
+        /**
+         * <inheritdoc/>
+         */
         public byte GetID()
         {
             return 4;

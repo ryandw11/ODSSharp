@@ -6,25 +6,16 @@ namespace ODS.Compression
     /**
      * <summary>Compress the file using the ZLIB compression format.</summary>
      */
-    public class ZLIBCompression : Compressor
+    public class ZLIBCompression : ICompressor
     {
-        public byte[] Compress(byte[] data)
+        public System.IO.Stream GetCompressStream(System.IO.Stream stream)
         {
-            MemoryStream stream = new MemoryStream();
-            DeflaterOutputStream zipStream = new DeflaterOutputStream(stream);
-            zipStream.Write(data, 0, data.Length);
-            zipStream.Close();
-            return stream.ToArray();
+            return new DeflaterOutputStream(stream);
         }
 
-        public byte[] Decompress(byte[] data)
+        public System.IO.Stream GetDecompressStream(System.IO.Stream stream)
         {
-            MemoryStream stream = new MemoryStream(data);
-            InflaterInputStream zipStream = new InflaterInputStream(stream);
-            MemoryStream output = new MemoryStream();
-            zipStream.CopyTo(output);
-            zipStream.Close();
-            return output.ToArray();
+            return new InflaterInputStream(stream);
         }
     }
 }

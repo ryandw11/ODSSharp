@@ -1,41 +1,64 @@
 ﻿using System;
 using System.Text;
-using ODS.Stream;
+using ODS.ODSStreams;
 using System.IO;
 
 namespace ODS.Tags
 {
-    public class CharTag : Tag<Char>
+    /**
+     * <summary>The tag that stores a character.</summary>
+     */
+    public class CharTag : Tag<char>
     {
         private string name;
         private char value;
 
-        public CharTag(String name, char value)
+        /**
+         * <summary>Construct a char tag.</summary>
+         * <param name="name">The name of the tag.</param>
+         * <param name="value">The value of the tag.</param>
+         */
+        public CharTag(string name, char value)
         {
             this.name = name;
             this.value = value;
         }
 
-        public void SetValue(Char s)
+        /**
+         * <inheritdoc/>
+         */
+        public void SetValue(char s)
         {
             this.value = s;
         }
 
-        public Char GetValue()
+        /**
+         * <inheritdoc/>
+         */
+        public char GetValue()
         {
             return value;
         }
 
-        public void SetName(String name)
+        /**
+         * <inheritdoc/>
+         */
+        public void SetName(string name)
         {
             this.name = name;
         }
 
-        public String GetName()
+        /**
+         * <inheritdoc/>
+         */
+        public string GetName()
         {
             return name;
         }
 
+        /**
+         * <inheritdoc/>
+         */
         public void WriteData(BigBinaryWriter dos)
         {
             dos.Write(GetID());
@@ -50,12 +73,18 @@ namespace ODS.Tags
             dos.Write(memStream.ToArray());
         }
 
-        public Tag<Char> CreateFromData(byte[] value)
+        /**
+         * <inheritdoc/>
+         */
+        public Tag<char> CreateFromData(byte[] value)
         {
             this.value = BitConverter.ToChar(value, 0);
             return this;
         }
 
+        /**
+         * <inheritdoc/>
+         */
         public byte GetID()
         {
             return 7;

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace ODS.Stream
+namespace ODS.ODSStreams
 {
     /**
      * <summary>This utility class swaps the Endianess of the formats.</summary>

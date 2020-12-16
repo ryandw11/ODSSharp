@@ -4,6 +4,9 @@ using System.Text;
 
 namespace ODS.Exceptions
 {
+    /**
+     * <summary>The standard ODS exception.</summary>
+     */
     class ODSException : Exception
     {
         public ODSException() { }

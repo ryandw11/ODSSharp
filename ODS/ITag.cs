@@ -1,4 +1,4 @@
-﻿using ODS.Stream;
+﻿using ODS.ODSStreams;
 
 namespace ODS
 {
