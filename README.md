@@ -13,9 +13,9 @@ Please read the wiki for more information abou the changes from the Java version
 # Installation
 Install ODSSharp via the `.NET CLI`
 ```
-dotnet add package ODSSharp --version 1.0.1
+dotnet add package ODSSharp --version 1.0.2
 ```
-or [via Nuget](https://www.nuget.org/packages/ODSSharp/1.0.1)
+or [via Nuget](https://www.nuget.org/packages/ODSSharp/1.0.2)
 
 # Usage
 As stated above ODS uses tags. There are many primative tags: StringTag, IntTag, ShortTag, LongTag, ByteTag, DoubleTag, FloatTag.
