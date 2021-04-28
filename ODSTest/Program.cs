@@ -12,7 +12,7 @@ namespace ODSTest
     {
         static void Main(string[] args)
         {
-            ObjectDataStructure ods = new ObjectDataStructure(new FileInfo(Directory.GetCurrentDirectory() + @"\test3.ods"), new GZIPCompression());
+            ObjectDataStructure ods = new ObjectDataStructure(new FileInfo(Directory.GetCurrentDirectory() + @"\test3.ods"), new NoCompression());
             // Register a custom tag.
             ODSUtil.RegisterCustomTag(new CustomTag("", ""));
 
@@ -37,6 +37,13 @@ namespace ODSTest
             tags.Add(car);
 
             tags.Add(new CustomTag("Test", "Test"));
+
+            CompressedObjectTag compressedObjectTag = new CompressedObjectTag("TestCompressedObject");
+            compressedObjectTag.AddTag(ODSUtil.Wrap("TestObject", "This is a test!"));
+            compressedObjectTag.AddTag(ODSUtil.Wrap("Number", 15));
+            compressedObjectTag.AddTag(ODSUtil.Wrap("Decimal", 34.5));
+            tags.Add(compressedObjectTag);
+
 
             ods.Save(tags);
 
@@ -65,6 +72,11 @@ namespace ODSTest
             ods.Set("Car.Owner.firstName", new StringTag("firstName", "Example"));
             ods.ReplaceData("Car.Owner.Age", new IntTag("Age", 3));
             Console.WriteLine(ODSUtil.UnWrap((IntTag)ods.Get("Car.Owner.Age")));
+
+            CompressedObjectTag compressedObject = (CompressedObjectTag) ods.Get("TestCompressedObject");
+
+            IntTag numberTag = (IntTag) compressedObject.GetTag("Number");
+            Console.WriteLine("Test Compression Number: " + numberTag.GetValue());
             //ods.Set("Car.Owner.Age", new IntTag("Age", 3));
 
         }
