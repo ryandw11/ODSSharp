@@ -12,7 +12,7 @@ namespace ODSTest
     {
         static void Main(string[] args)
         {
-            ObjectDataStructure ods = new ObjectDataStructure(new FileInfo(Directory.GetCurrentDirectory() + @"\test3.ods"), new NoCompression());
+            ObjectDataStructure ods = new ObjectDataStructure(new FileInfo(Directory.GetCurrentDirectory() + @"\test3.ods"), new GZIPCompression());
             // Register a custom tag.
             ODSUtil.RegisterCustomTag(new CustomTag("", ""));
 
@@ -77,6 +77,8 @@ namespace ODSTest
 
             IntTag numberTag = (IntTag) compressedObject.GetTag("Number");
             Console.WriteLine("Test Compression Number: " + numberTag.GetValue());
+
+            ods.SaveToFile(new FileInfo(@"new_file.ods"), new GZIPCompression());
             //ods.Set("Car.Owner.Age", new IntTag("Age", 3));
 
         }

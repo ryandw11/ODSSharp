@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 
 using ODS.Compression;
@@ -22,5 +23,8 @@ namespace ODS.Internal
         bool ReplaceData(string key, ITag replacement);
         void Set(string key, ITag value);
         byte[] Export(ICompressor compressor);
+        void ImportFile(FileInfo file, ICompressor compressor);
+        void SaveToFile(FileInfo file, ICompressor compressor);
+        void Clear();
     }
 }

@@ -10,9 +10,11 @@ using ODS.Exceptions;
 
 namespace ODS.Tags
 {
-    /**
-     * <summary>A tag that contains an compressed object.</summary>
-     */
+    /// <summary>
+    /// Any tags within the CompressedObject will be compressed using the specified compressor when being written to a file or memeory.
+    /// <para>Tags within a compressed object cannot be obtained using <see cref="ObjectDataStructure.Get(string)"/> or similar methods.
+    /// Attempting to will result in a <see cref="CompressedObjectException"/>.</para>
+    /// </summary>
     public class CompressedObjectTag : Tag<List<ITag>>
     {
         private string name;

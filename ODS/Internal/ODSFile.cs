@@ -426,5 +426,73 @@ namespace ODS.Internal
                 }
             }
         }
+
+        /// <summary>
+        ///     <para>Import a file into this file.</para>
+        ///     <para>This basically copies one file to another.</para>
+        ///     <para>This <b>will</b> overwrite the current file.</para>
+        /// </summary>
+        /// <param name="file">The file to copy from.</param>
+        /// <param name="compressor">The compression of the other file.</param>
+        public void ImportFile(FileInfo file, ICompressor compressor)
+        {
+            using(FileStream fileStream = new FileStream(file.FullName, FileMode.Open, FileAccess.Read, FileShare.Read))
+            {
+                using (MemoryStream decompressedMem = new MemoryStream())
+                {
+                    using (Stream decompressStream = compressor.GetDecompressStream(fileStream))
+                    {
+                        decompressStream.CopyTo(decompressedMem);
+                    }
+                    using (FileStream outputFile = new FileStream(this.file.FullName, FileMode.Create, FileAccess.Write, FileShare.Write))
+                    {
+                        using(Stream compressStream = this.compression.GetCompressStream(outputFile))
+                        {
+                            decompressedMem.Position = 0;
+                            decompressedMem.CopyTo(compressStream);
+                        }
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        ///     <para>Export to another file.</para>
+        ///     <para>This basically copies the current file into another one.</para>
+        /// </summary>
+        /// <param name="file">The other file to copy to.</param>
+        /// <param name="compressor">The desired compression of the copy file.</param>
+        public void SaveToFile(FileInfo file, ICompressor compressor)
+        {
+            using (FileStream fileStream = new FileStream(this.file.FullName, FileMode.Open, FileAccess.Read, FileShare.Read))
+            {
+                MemoryStream decompressedMem = new MemoryStream();
+                using (Stream decompressStream = this.compression.GetDecompressStream(fileStream))
+                {
+                    decompressStream.CopyTo(decompressedMem);
+                }
+                
+                using (FileStream outputFile = new FileStream(file.FullName, FileMode.Create, FileAccess.Write, FileShare.Write))
+                {
+                    using (Stream compressStream = compressor.GetCompressStream(outputFile))
+                    {
+                        decompressedMem.Position = 0;
+                        decompressedMem.CopyTo(compressStream);
+                        
+                    }
+                }
+                decompressedMem.Close();
+
+            }
+        }
+
+        /// <summary>
+        ///     <para>Clears all the data from the file.</para>
+        ///     <para>This works internally by overwriting the file.</para>
+        /// </summary>
+        public void Clear()
+        {
+            this.file.Create();
+        }
     }
 }

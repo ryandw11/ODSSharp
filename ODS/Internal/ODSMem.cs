@@ -305,5 +305,51 @@ namespace ODS.Internal
                 return mem.ToArray();
             }
         }
+
+        /// <summary>
+        /// Import data from an ODS file into the stream.
+        /// </summary>
+        /// <param name="file">The file to import from.</param>
+        /// <param name="compressor">The compression of that file.</param>
+        public void ImportFile(FileInfo file, ICompressor compressor)
+        {
+            memStream.SetLength(0);
+            memStream.Position = 0;
+            using (FileStream fileStream = new FileStream(file.FullName, FileMode.Open, FileAccess.Read, FileShare.Read))
+            {
+                using (Stream decompressStream = compressor.GetDecompressStream(fileStream))
+                {
+                    decompressStream.CopyTo(memStream);
+                }
+            }
+            memStream.Position = 0;
+        }
+
+        /// <summary>
+        /// Save data from the stream into a file.
+        /// </summary>
+        /// <param name="file">The file to save to.</param>
+        /// <param name="compressor">The compression to use for that file.</param>
+        public void SaveToFile(FileInfo file, ICompressor compressor)
+        {
+            using(FileStream fileStream = new FileStream(file.FullName, FileMode.Create, FileAccess.Write, FileShare.Write))
+            {
+                using (Stream compressionStream = compressor.GetCompressStream(fileStream))
+                {
+                    memStream.Position = 0;
+                    memStream.CopyTo(compressionStream);
+                }
+            }
+            memStream.Position = 0;
+        }
+
+        /// <summary>
+        /// Clear the stream.
+        /// </summary>
+        public void Clear()
+        {
+            memStream.SetLength(0);
+            memStream.Position = 0;
+        }
     }
 }
