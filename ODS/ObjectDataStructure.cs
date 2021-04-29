@@ -192,5 +192,43 @@ namespace ODS
             return odsInternal.Export(compressor);
         }
 
+        /**
+         * <summary>
+         *  <para>Import the data from an ODS file.</para>
+         *  <para>See <see cref="ODSMem.ImportFile(FileInfo, ICompressor)"/> and <see cref="ODSFile.ImportFile(FileInfo, ICompressor)"/> 
+         *  for the specifics.</para>
+         * </summary>
+         * 
+         * <param name="file">The file to import from.</param>
+         * <param name="compressor">The compressor.</param>
+         */
+        public void ImportFile(FileInfo file, ICompressor compressor)
+        {
+            odsInternal.ImportFile(file, compressor);
+        }
+
+        /**
+         * <summary>
+         *  <para>Save the data to a file.</para>
+         *  <para>See <see cref="ODSMem.SaveToFile(FileInfo, ICompressor)"/> and <see cref="ODSFile.SaveToFile(FileInfo, ICompressor)"/> for
+         *  the specifics.</para>
+         * </summary>
+         * 
+         * <param name="file">The file.</param>
+         * <param name="compressor">The compressor.</param>
+         */
+        public void SaveToFile(FileInfo file, ICompressor compressor)
+        {
+            odsInternal.SaveToFile(file, compressor);
+        }
+
+        /**
+         * <summary>Clear all data from the file / memory.</summary>
+         */
+        public void Clear()
+        {
+            odsInternal.Clear();
+        }
+
     }
 }

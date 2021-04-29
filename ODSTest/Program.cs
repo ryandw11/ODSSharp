@@ -38,6 +38,13 @@ namespace ODSTest
 
             tags.Add(new CustomTag("Test", "Test"));
 
+            CompressedObjectTag compressedObjectTag = new CompressedObjectTag("TestCompressedObject");
+            compressedObjectTag.AddTag(ODSUtil.Wrap("TestObject", "This is a test!"));
+            compressedObjectTag.AddTag(ODSUtil.Wrap("Number", 15));
+            compressedObjectTag.AddTag(ODSUtil.Wrap("Decimal", 34.5));
+            tags.Add(compressedObjectTag);
+
+
             ods.Save(tags);
 
             ods.Append(new StringTag("Test", "test"));
@@ -65,6 +72,13 @@ namespace ODSTest
             ods.Set("Car.Owner.firstName", new StringTag("firstName", "Example"));
             ods.ReplaceData("Car.Owner.Age", new IntTag("Age", 3));
             Console.WriteLine(ODSUtil.UnWrap((IntTag)ods.Get("Car.Owner.Age")));
+
+            CompressedObjectTag compressedObject = (CompressedObjectTag) ods.Get("TestCompressedObject");
+
+            IntTag numberTag = (IntTag) compressedObject.GetTag("Number");
+            Console.WriteLine("Test Compression Number: " + numberTag.GetValue());
+
+            ods.SaveToFile(new FileInfo(@"new_file.ods"), new GZIPCompression());
             //ods.Set("Car.Owner.Age", new IntTag("Age", 3));
 
         }

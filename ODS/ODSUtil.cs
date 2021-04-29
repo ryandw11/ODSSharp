@@ -4,6 +4,7 @@ using ODS.Tags;
 using ODS.Serializer;
 using System.Reflection;
 using ODS.Exceptions;
+using ODS.Compression;
 
 namespace ODS
 {
@@ -12,8 +13,18 @@ namespace ODS
      */
     public class ODSUtil
     {
-        internal static bool ignoreInvalidCustomTags = false; 
+        internal static bool ignoreInvalidCustomTags = false;
         private static List<ITag> customTags = new List<ITag>();
+        private static Dictionary<string, ICompressor> compressorDictionary = new Dictionary<string, ICompressor>();
+
+        /// <summary>
+        /// Static ODSUtil constructor.
+        /// </summary>
+        static ODSUtil()
+        {
+            compressorDictionary.Add("GZIP", new GZIPCompression());
+            compressorDictionary.Add("ZLIB", new ZLIBCompression());
+        }
 
         private ODSUtil() { }
 
@@ -295,6 +306,51 @@ namespace ODS
         public static void AllowUndefinedTags(bool value)
         {
             ignoreInvalidCustomTags = value;
+        }
+
+        /**
+         * <summary>
+         *  <para>Add a custom compression type by name.</para>
+         *  <para>This exists so objects that rely on compression, like the <see cref="CompressedObjectTag"/>, are able
+         *  to be cross language. So if you have a ZSTD compressed object made in Java, you can still read it in C# by registering
+         *  a Compressor with the same name.</para>
+         * </summary>
+         * 
+         * <param name="name">The name.</param>
+         * <param name="compressor">The compressor.</param>
+         */
+        public static void RegisterCompression(string name, ICompressor compressor)
+        {
+            compressorDictionary.Add(name, compressor);
+        }
+
+        /**
+         * <summary>Get the compressor registered with a name.</summary>
+         * 
+         * <param name="name">The name of the compressor.</param>
+         * <returns>The retrieved compressor. (Null if not found.)</returns>
+         */
+        public static ICompressor GetCompressor(string name)
+        {
+            return compressorDictionary[name];
+        }
+
+        /**
+         * <summary>Get the name of a compressor.</summary>
+         * 
+         * <param name="compressor">The compressor.</param>
+         * <returns>The retrieved name of the compressor. (Null if not found.)</returns>
+         */
+        public static string GetCompressorName(ICompressor compressor)
+        {
+            foreach (KeyValuePair<string, ICompressor> entry in compressorDictionary)
+            {
+                if(entry.Value.GetType() == compressor.GetType())
+                {
+                    return entry.Key;
+                }
+            }
+            return null;
         }
     }
 }

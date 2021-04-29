@@ -114,6 +114,8 @@ namespace ODS
                     return new DictionaryTag<ITag>(this.name, new Dictionary<string, ITag>()).CreateFromData(this.valueBytes);
                 case 11:
                     return new ObjectTag(this.name).CreateFromData(this.valueBytes);
+                case 12:
+                    return new CompressedObjectTag(this.name).CreateFromData(this.valueBytes);
                 default:
                     foreach (ITag tag in ODSUtil.GetCustomTags())
                     {

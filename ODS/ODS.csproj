@@ -10,7 +10,7 @@
     <Description>Object Data Structure is a fast byte based file format designed for video games.</Description>
     <RepositoryUrl>https://github.com/ryandw11/ODSSharp</RepositoryUrl>
     <PackageTags>ODS, File Format, File, Storage, Fast, Games</PackageTags>
-    <Version>1.0.2</Version>
+    <Version>1.0.5</Version>
   </PropertyGroup>
 
   <ItemGroup>

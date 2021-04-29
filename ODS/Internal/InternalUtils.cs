@@ -5,6 +5,7 @@ using System.Text;
 using System.IO;
 using ODS.ODSStreams;
 using ODS.Util;
+using ODS.Exceptions;
 
 namespace ODS.Internal
 {
@@ -105,7 +106,10 @@ namespace ODS.Internal
                 }
 
                 if (otherKey != null)
+                {
+                    validateNotCompressed(currentBuilder);
                     return GetSubObjectData(stream, otherKey);
+                }
 
                 byte[] value = binReader.ReadBytes((int)(currentBuilder.getStartingIndex() - stream.Position) + (int)currentBuilder.getDataSize());
                 currentBuilder.setValueBytes(value);
@@ -166,10 +170,13 @@ namespace ODS.Internal
                     continue;
                 }
 
-                
+
 
                 if (otherKey != null)
+                {
+                    validateNotCompressed(currentBuilder);
                     return FindSubObjectData(stream, otherKey);
+                }
 
                 byte[] value = binReader.ReadBytes((int)(currentBuilder.getStartingIndex() - stream.Position) + (int)currentBuilder.getDataSize());
                 currentBuilder.setValueBytes(value);
@@ -357,6 +364,8 @@ namespace ODS.Internal
 
                 if (otherKey != null)
                 {
+                    validateNotCompressed(currentBuilder);
+
                     child.SetSize(currentBuilder.getDataSize());
                     child.SetName(currentBuilder.getName());
                     counter.AddChild(child);
@@ -368,6 +377,16 @@ namespace ODS.Internal
                 return counter;
             }
             return null;
+        }
+
+        /// <summary>
+        /// Validate that the current tag is not a CompressedObject, if it is, throw an exception.
+        /// </summary>
+        /// <param name="builder">The builder.</param>
+        private static void validateNotCompressed(TagBuilder builder)
+        {
+            if (builder.getDataType() == 12)
+                throw new CompressedObjectException("Unable to traverse a Compressed Object. Consider decompressing the object '" + builder.getName() + "' first.");
         }
 
         /**
